@@ -27,9 +27,16 @@ Route.put('entradas/:id', 'EntradasController.update');
 Route.delete('entradas', 'EntradasController.delete');
 
 //Filtros especificos
-Route.get('entradas/grupos', 'EntradasController.showgrupos'); 
-Route.get('entradas/:instalacao_identificador/:id_grupo/:cnpj', 'EntradasController.showentradas');
-Route.get('entradas/postos', 'EntradasController.showpostos');
+Route.get('entradas/grupos', 'EntradasController.showgrupos').middleware("auth");
+Route.get('entradas/:instalacao_identificador/:id_grupo/:cnpj', 'EntradasController.showentradas').middleware("auth");
+Route.get('entradas/postos', 'EntradasController.showpostos').middleware("auth");
+
+//Users controller
+
+Route.post('user/create', 'UsersController.create')
+Route.post('auth', 'UsersController.auth')
+Route.get('user/find', 'UsersController.find').middleware("auth")
+
 
 Route.resource('verifica', 'VerificasController')
 Route.resource('identificadores-bloqueados', 'IdentificadoresBloqueadosController')
