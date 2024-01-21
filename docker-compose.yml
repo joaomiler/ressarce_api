@@ -2,11 +2,32 @@ version: '3.9'
 
 services:
   db:
+    restart: always
     image: mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=app
-      - MYSQL_USER=dev
-      - MYSQL_PASSWORD=dev
+    env_file:
+      - .env.db
     ports:
       - "3306:3306"
+    networks:
+      - "app-net"
+    volumes:
+      - ../mysql-data:/var/lib/mysql
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    restart: always
+
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      - MYSQL_HOST=db
+    networks:
+      - "app-net"
+    ports:
+      - "3333:3333"
+networks:
+  app-net:
+    driver: bridge
