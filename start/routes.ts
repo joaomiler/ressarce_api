@@ -35,7 +35,9 @@ Route.get('entradas/postos', 'EntradasController.showpostos').middleware("auth")
 
 Route.post('user/create', 'UsersController.create')
 Route.post('auth', 'UsersController.auth')
-Route.get('user/find', 'UsersController.find').middleware("auth")
+Route.put('user/update', 'UsersController.edit').middleware("auth")
+Route.delete('user/delete', 'UsersController.destroy').middleware("auth")
+
 
 
 Route.resource('verifica', 'VerificasController')

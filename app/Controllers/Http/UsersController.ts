@@ -49,11 +49,82 @@ export default class UsersController {
 
   public async show({}: HttpContextContract) {}
 
-  public async edit({}: HttpContextContract) {}
+  public async edit({request, response, auth}: HttpContextContract) {
+    const {guards: {api:{user}}} = auth.toJSON()
+    const {email, password} = request.body()
+
+    const id = user.id
+
+    if (!id){
+      return response.status(400)
+    }
+
+    try{
+      const userExists = await User.findBy("id", id)
+      if(!userExists) return response.notFound("Usuário não existe!")
+
+    }catch(e){
+      return response.status(500).send(e)
+    }
+
+
+    try{
+      if (email){
+        const emailAlreayUsed = await User.findBy("email",email)
+        if(emailAlreayUsed) return response.notFound("Email já esta sendo usado!")
+
+      }
+    }catch(e){
+      return response.status(500).send(e)
+    }
+
+
+    try{
+      const user = await User.updateOrCreate({
+        id: id
+      },{
+        email: email,
+        password: password === undefined ? undefined : await Hash.make(password)
+      })
+
+      user.password = ""
+
+      return response.ok(user)
+
+    }catch(e){
+      return response.status(500).send("Erro para atualizar o usuário!")
+    }
+
+  }
 
   public async update({}: HttpContextContract) {}
 
-  public async destroy({}: HttpContextContract) {}
+  public async destroy({auth, response}: HttpContextContract) {
+    const {guards: {api:{user}}} = auth.toJSON()
+
+    const id = user.id
+
+    if (!id){
+      return response.status(400)
+    }
+
+    try{
+      const userExists = await User.findBy("id", id)
+      if(!userExists) return response.notFound("Usuário não existe!")
+
+    }catch(e){
+      return response.status(500).send(e)
+    }
+
+    try{
+      await User.query().where("id",id).delete()
+      return response.ok(undefined)
+    }catch(e){
+      return response.status(500).send("Erro para deletar o usuário!")
+    }
+
+
+  }
 
   public async auth({request, auth, response}: HttpContextContract) {
 
